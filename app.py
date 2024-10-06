@@ -38,15 +38,15 @@ st.title("Imports and Exports Dashboard")
 
 # Check if filtered_df is not empty
 if not filtered_df.empty:
-    # Create a single row for the first four charts (4 columns)
-    col1, col2, col3, col4 = st.columns(4)
+    # Create the first row for the first two charts
+    col1, col2 = st.columns(2)
 
     with col1:
         # Count the number of Import and Export transactions in the filtered data
         transaction_counts = filtered_df['Import_Export'].value_counts()
 
         # Plot the pie chart for imports and exports
-        st.subheader('Percentage of Import and Export Transactions')
+        st.subheader('Percentage of Import and Export Transactions', font_size=12)
         fig2, ax2 = plt.subplots(figsize=(5, 4))  # Adjusted size for better fit
         ax2.pie(transaction_counts, labels=transaction_counts.index, autopct='%1.1f%%', startangle=90, colors=['skyblue', 'lightgreen'])
         ax2.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
@@ -57,30 +57,33 @@ if not filtered_df.empty:
         payment_mode_counts = filtered_df['Payment_Terms'].value_counts()
 
         # Plot a horizontal bar chart for payment modes
-        st.subheader('Most Preferred Payment Modes')
+        st.subheader('Most Preferred Payment Modes', font_size=12)
         fig1, ax1 = plt.subplots(figsize=(5, 4))  # Adjusted size for better fit
         colors = plt.cm.viridis(np.linspace(0, 1, len(payment_mode_counts)))
         payment_mode_counts.plot(kind='barh', color=colors, ax=ax1)
 
         # Add labels and title for payment modes
-        ax1.set_title('Most Preferred Payment Modes')
-        ax1.set_xlabel('Number of Transactions')
-        ax1.set_ylabel('Payment Mode')
+        ax1.set_title('Most Preferred Payment Modes', fontsize=10)
+        ax1.set_xlabel('Number of Transactions', fontsize=10)
+        ax1.set_ylabel('Payment Mode', fontsize=10)
 
         # Show the plot for payment modes
         st.pyplot(fig1)
 
+    # Create the second row for the next two charts
+    col3, col4 = st.columns(2)
+
     with col3:
         # Plot a stacked bar chart
-        st.subheader('Transactions by Category (Stacked by Import/Export)')
+        st.subheader('Transactions by Category (Stacked by Import/Export)', font_size=12)
         category_transaction_counts = filtered_df.groupby(['Category', 'Import_Export']).size().unstack()
         fig3, ax3 = plt.subplots(figsize=(5, 4))  # Adjusted size
         category_transaction_counts.plot(kind='bar', stacked=True, ax=ax3, color=['skyblue', 'lightgreen'])
 
         # Add labels and title for stacked bar chart
-        ax3.set_title('Transactions by Category (Stacked by Import/Export)')
-        ax3.set_xlabel('Category')
-        ax3.set_ylabel('Number of Transactions')
+        ax3.set_title('Transactions by Category (Stacked by Import/Export)', fontsize=10)
+        ax3.set_xlabel('Category', fontsize=10)
+        ax3.set_ylabel('Number of Transactions', fontsize=10)
         ax3.legend(title='Transaction Type')
 
         # Show the plot for stacked bar chart
@@ -88,7 +91,7 @@ if not filtered_df.empty:
 
     with col4:
         # Plot the line graph for average transaction value by month
-        st.subheader('Average Value of Transactions by Month')
+        st.subheader('Average Value of Transactions by Month', font_size=12)
         filtered_df['Date'] = pd.to_datetime(filtered_df['Date'], format='%d-%m-%Y')
         filtered_df['Month'] = filtered_df['Date'].dt.month
         monthly_avg_value = filtered_df.groupby(['Month', 'Import_Export'])['Value'].mean().unstack()
@@ -99,9 +102,9 @@ if not filtered_df.empty:
             ax4.plot(monthly_avg_value.index, monthly_avg_value[column], marker='o', label=column)
 
         # Add labels and title for line graph
-        ax4.set_title('Average Value of Transactions by Month')
-        ax4.set_xlabel('Month')
-        ax4.set_ylabel('Average Transaction Value')
+        ax4.set_title('Average Value of Transactions by Month', fontsize=10)
+        ax4.set_xlabel('Month', fontsize=10)
+        ax4.set_ylabel('Average Transaction Value', fontsize=10)
         ax4.grid(True)
         ax4.legend(title='Transaction Type')  # Add legend to distinguish between imports and exports
 
@@ -136,4 +139,4 @@ if not filtered_df.empty:
     st.plotly_chart(fig5)
 
 else:
-    st.warning("No data available for the selected filters.")
+    st.warning("No data available for the selected filters. Please select at least 1 item from each filter.")
