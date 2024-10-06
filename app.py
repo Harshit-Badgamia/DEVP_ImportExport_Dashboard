@@ -127,7 +127,7 @@ if not filtered_df.empty:
                           locationmode='country names',  # Use country names
                           color='Total',  # Color based on total value
                           hover_name=country_values_pivot.index,
-                          title='Total Import and Export Values by Country'
+                          title='Total Import and Export Values by Country',
                           color_continuous_scale=px.colors.sequential.Plasma,
                           labels={'Total': 'Total Value (in USD)'})
 
