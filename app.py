@@ -112,7 +112,6 @@ if not filtered_df.empty:
         st.pyplot(fig4)
 
     # Create a single column for the map below the charts
-    st.markdown('### Total Import and Export Values by Country')  # Changed to markdown for title
     # Group the data by country and import/export status from filtered data
     country_values = filtered_df.groupby(['Country', 'Import_Export'])['Value'].sum().reset_index()
 
@@ -128,6 +127,7 @@ if not filtered_df.empty:
                           locationmode='country names',  # Use country names
                           color='Total',  # Color based on total value
                           hover_name=country_values_pivot.index,
+                          title='Total Import and Export Values by Country'
                           color_continuous_scale=px.colors.sequential.Plasma,
                           labels={'Total': 'Total Value (in USD)'})
 
