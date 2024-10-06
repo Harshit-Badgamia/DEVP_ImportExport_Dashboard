@@ -136,7 +136,7 @@ if not filtered_df.empty:
     fig5.update_layout(width=1200, height=600)  # Adjust width and height as desired
 
     # Show the figure for choropleth map
-    st.plotly_chart(fig5)
+    st.plotly_chart(fig5,use_container_width=True)
 
 
 else:
