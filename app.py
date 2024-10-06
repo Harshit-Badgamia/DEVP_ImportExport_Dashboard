@@ -36,16 +36,13 @@ filtered_df = df_sample[
 # Title of the dashboard
 st.title("Imports and Exports Dashboard")
 
-# Count the occurrences of each payment mode in the filtered data
-payment_mode_counts = filtered_df['Payment_Terms'].value_counts()
-
-# Count the number of Import and Export transactions in the filtered data
-transaction_counts = filtered_df['Import_Export'].value_counts()
-
-# Create columns for the pie chart and horizontal bar chart
-col1, col2 = st.columns(2)
+# Create columns for the first row (3 columns)
+col1, col2, col3 = st.columns(3)
 
 with col1:
+    # Count the number of Import and Export transactions in the filtered data
+    transaction_counts = filtered_df['Import_Export'].value_counts()
+
     # Plot the pie chart for imports and exports
     st.subheader('Percentage of Import and Export Transactions')
     fig2, ax2 = plt.subplots(figsize=(6, 6))  # Adjusted size for better fit
@@ -54,6 +51,9 @@ with col1:
     st.pyplot(fig2)
 
 with col2:
+    # Count the occurrences of each payment mode in the filtered data
+    payment_mode_counts = filtered_df['Payment_Terms'].value_counts()
+
     # Plot a horizontal bar chart for payment modes
     st.subheader('Most Preferred Payment Modes')
     fig1, ax1 = plt.subplots(figsize=(6, 6))  # Adjusted size for better fit
@@ -68,13 +68,26 @@ with col2:
     # Show the plot for payment modes
     st.pyplot(fig1)
 
-# Group the filtered data by Category and Import_Export, then count the number of transactions
-category_transaction_counts = filtered_df.groupby(['Category', 'Import_Export']).size().unstack()
-
-# Create columns for the line chart and stacked bar chart
-col3, col4 = st.columns(2)
-
 with col3:
+    # Plot a stacked bar chart
+    st.subheader('Transactions by Category (Stacked by Import/Export)')
+    category_transaction_counts = filtered_df.groupby(['Category', 'Import_Export']).size().unstack()
+    fig3, ax3 = plt.subplots(figsize=(6, 6))  # Adjusted size
+    category_transaction_counts.plot(kind='bar', stacked=True, ax=ax3, color=['skyblue', 'lightgreen'])
+
+    # Add labels and title for stacked bar chart
+    ax3.set_title('Transactions by Category (Stacked by Import/Export)')
+    ax3.set_xlabel('Category')
+    ax3.set_ylabel('Number of Transactions')
+    ax3.legend(title='Transaction Type')
+
+    # Show the plot for stacked bar chart
+    st.pyplot(fig3)
+
+# Create columns for the second row (2 columns)
+col4, col5 = st.columns(2)
+
+with col4:
     # Plot the line graph for average transaction value by month
     st.subheader('Average Value of Transactions by Month')
     filtered_df['Date'] = pd.to_datetime(filtered_df['Date'], format='%d-%m-%Y')
@@ -96,43 +109,29 @@ with col3:
     # Show the plot for average transaction value
     st.pyplot(fig4)
 
-with col4:
-    # Plot a stacked bar chart
-    st.subheader('Transactions by Category (Stacked by Import/Export)')
-    fig3, ax3 = plt.subplots(figsize=(6, 6))  # Adjusted size
-    category_transaction_counts.plot(kind='bar', stacked=True, ax=ax3, color=['skyblue', 'lightgreen'])
+with col5:
+    # Group the data by country and import/export status from filtered data
+    country_values = filtered_df.groupby(['Country', 'Import_Export'])['Value'].sum().reset_index()
 
-    # Add labels and title for stacked bar chart
-    ax3.set_title('Transactions by Category (Stacked by Import/Export)')
-    ax3.set_xlabel('Category')
-    ax3.set_ylabel('Number of Transactions')
-    ax3.legend(title='Transaction Type')
+    # Pivot the data for plotting
+    country_values_pivot = country_values.pivot(index='Country', columns='Import_Export', values='Value').fillna(0)
 
-    # Show the plot for stacked bar chart
-    st.pyplot(fig3)
+    # Create a new column for total value
+    country_values_pivot['Total'] = country_values_pivot.sum(axis=1)
 
-# Group the data by country and import/export status from filtered data
-country_values = filtered_df.groupby(['Country', 'Import_Export'])['Value'].sum().reset_index()
+    # Create a map chart
+    st.subheader('Total Import and Export Values by Country')
+    fig5 = px.choropleth(country_values_pivot,
+                          locations=country_values_pivot.index,
+                          locationmode='country names',  # Use country names
+                          color='Total',  # Color based on total value
+                          hover_name=country_values_pivot.index,
+                          title='Total Import and Export Values by Country',
+                          color_continuous_scale=px.colors.sequential.Plasma,
+                          labels={'Total': 'Total Value (in USD)'})
 
-# Pivot the data for plotting
-country_values_pivot = country_values.pivot(index='Country', columns='Import_Export', values='Value').fillna(0)
+    # Update layout for larger size
+    fig5.update_layout(width=1400, height=800)  # Adjust width and height as desired
 
-# Create a new column for total value
-country_values_pivot['Total'] = country_values_pivot.sum(axis=1)
-
-# Create a map chart
-st.subheader('Total Import and Export Values by Country')
-fig5 = px.choropleth(country_values_pivot,
-                      locations=country_values_pivot.index,
-                      locationmode='country names',  # Use country names
-                      color='Total',  # Color based on total value
-                      hover_name=country_values_pivot.index,
-                      title='Total Import and Export Values by Country',
-                      color_continuous_scale=px.colors.sequential.Plasma,
-                      labels={'Total': 'Total Value (in USD)'})
-
-# Update layout for larger size
-fig5.update_layout(width=1400, height=800)  # Adjust width and height as desired
-
-# Show the figure for choropleth map
-st.plotly_chart(fig5, use_container_width=True)
+    # Show the figure for choropleth map
+    st.plotly_chart(fig5, use_container_width=True)
