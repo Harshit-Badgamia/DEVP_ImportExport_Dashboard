@@ -6,7 +6,7 @@ import numpy as np
 import plotly.express as px
 
 # Import dataset
-df = pd.read_csv(r"Imports_Exports_Dataset.csv")
+df = pd.read_csv(r'Imports_Exports_Dataset.csv')
 
 # Random Sample from the dataset
 df_sample = df.sample(n=3001, random_state=55011)
@@ -19,7 +19,7 @@ payment_mode_counts = df_sample['Payment_Terms'].value_counts()
 
 # Plot a horizontal bar chart for payment modes
 st.subheader('Most Preferred Payment Modes')
-fig1, ax1 = plt.subplots(figsize=(8, 6))
+fig1, ax1 = plt.subplots(figsize=(8, 4))  # Adjusted size
 colors = plt.cm.viridis(np.linspace(0, 1, len(payment_mode_counts)))
 payment_mode_counts.plot(kind='barh', color=colors, ax=ax1)
 
@@ -36,7 +36,7 @@ transaction_counts = df_sample['Import_Export'].value_counts()
 
 # Plot the pie chart for imports and exports
 st.subheader('Percentage of Import and Export Transactions')
-fig2, ax2 = plt.subplots()
+fig2, ax2 = plt.subplots(figsize=(8, 4))  # Adjusted size
 ax2.pie(transaction_counts, labels=transaction_counts.index, autopct='%1.1f%%', startangle=90, colors=['skyblue', 'lightgreen'])
 ax2.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
 st.pyplot(fig2)
@@ -46,7 +46,7 @@ category_transaction_counts = df_sample.groupby(['Category', 'Import_Export']).s
 
 # Plot a stacked bar chart
 st.subheader('Transactions by Category (Stacked by Import/Export)')
-fig3, ax3 = plt.subplots(figsize=(8, 6))
+fig3, ax3 = plt.subplots(figsize=(8, 4))  # Adjusted size
 category_transaction_counts.plot(kind='bar', stacked=True, ax=ax3, color=['skyblue', 'lightgreen'])
 
 # Add labels and title for stacked bar chart
@@ -69,7 +69,7 @@ monthly_avg_value = df_sample.groupby(['Month', 'Import_Export'])['Value'].mean(
 
 # Plot the line graph for average transaction value by month
 st.subheader('Average Value of Transactions by Month')
-fig4, ax4 = plt.subplots(figsize=(8, 6))
+fig4, ax4 = plt.subplots(figsize=(8, 4))  # Adjusted size
 
 # Plot each import and export line
 for column in monthly_avg_value.columns:
@@ -106,7 +106,7 @@ fig5 = px.choropleth(country_values_pivot,
                       labels={'Total': 'Total Value (in USD)'})
 
 # Update layout for larger size
-fig5.update_layout(width=1200, height=800)  # Adjust the width and height as desired
+fig5.update_layout(width=1200, height=600)  # Adjust width and height as desired
 
 # Show the figure for choropleth map
-st.plotly_chart(fig5)
+st.plotly_chart(fig5, use_container_width=True)
