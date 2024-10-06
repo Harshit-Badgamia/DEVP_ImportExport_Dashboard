@@ -38,31 +38,7 @@ st.title("Imports and Exports Dashboard")
 
 # Check if filtered_df is not empty
 if not filtered_df.empty:
-       # Create a single column for the map below the charts
-    st.markdown('### Total Import and Export Values by Country')
-    # Group the data by country and import/export status from filtered data
-    country_values = filtered_df.groupby(['Country', 'Import_Export'])['Value'].sum().reset_index()
-
-    # Pivot the data for plotting
-    country_values_pivot = country_values.pivot(index='Country', columns='Import_Export', values='Value').fillna(0)
-
-    # Create a new column for total value
-    country_values_pivot['Total'] = country_values_pivot.sum(axis=1)
-
-    # Create a map chart
-    fig5 = px.choropleth(country_values_pivot,
-                          locations=country_values_pivot.index,
-                          locationmode='country names',  # Use country names
-                          color='Total',  # Color based on total value
-                          hover_name=country_values_pivot.index,
-                          color_continuous_scale=px.colors.sequential.Plasma,
-                          labels={'Total': 'Total Value (in USD)'})
-
-    # Update layout for larger size
-    fig5.update_layout(width=1200, height=600)  # Adjust width and height as desired
-
-    # Show the figure for choropleth map
-    st.plotly_chart(fig5)
+      
     # Create the first row for the first two charts
     col1, col2 = st.columns(2)
 
@@ -135,6 +111,32 @@ if not filtered_df.empty:
 
         # Show the plot for average transaction value
         st.pyplot(fig4)
+       
+    # Create a single column for the map below the charts
+    st.markdown('### Total Import and Export Values by Country')
+    # Group the data by country and import/export status from filtered data
+    country_values = filtered_df.groupby(['Country', 'Import_Export'])['Value'].sum().reset_index()
+
+    # Pivot the data for plotting
+    country_values_pivot = country_values.pivot(index='Country', columns='Import_Export', values='Value').fillna(0)
+
+    # Create a new column for total value
+    country_values_pivot['Total'] = country_values_pivot.sum(axis=1)
+
+    # Create a map chart
+    fig5 = px.choropleth(country_values_pivot,
+                          locations=country_values_pivot.index,
+                          locationmode='country names',  # Use country names
+                          color='Total',  # Color based on total value
+                          hover_name=country_values_pivot.index,
+                          color_continuous_scale=px.colors.sequential.Plasma,
+                          labels={'Total': 'Total Value (in USD)'})
+
+    # Update layout for larger size
+    fig5.update_layout(width=1200, height=600)  # Adjust width and height as desired
+
+    # Show the figure for choropleth map
+    st.plotly_chart(fig5)
 
 
 else:
