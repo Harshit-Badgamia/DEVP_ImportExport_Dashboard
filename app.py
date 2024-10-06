@@ -6,87 +6,113 @@ import numpy as np
 import plotly.express as px
 
 # Import dataset
-df = pd.read_csv(r'Imports_Exports_Dataset.csv')
+df = pd.read_csv('data/Imports_Exports_Dataset.csv')
 
 # Random Sample from the dataset
 df_sample = df.sample(n=3001, random_state=55011)
 
+# Sidebar for filters
+st.sidebar.title("Filters")
+
+# Category filter
+categories = df_sample['Category'].unique()
+selected_categories = st.sidebar.multiselect("Select Categories", options=categories, default=categories)
+
+# Import/Export filter
+import_export_options = df_sample['Import_Export'].unique()
+selected_import_export = st.sidebar.multiselect("Select Import/Export", options=import_export_options, default=import_export_options)
+
+# Payment Terms filter
+payment_terms = df_sample['Payment_Terms'].unique()
+selected_payment_terms = st.sidebar.multiselect("Select Payment Terms", options=payment_terms, default=payment_terms)
+
+# Filter the dataframe based on selections
+filtered_df = df_sample[
+    (df_sample['Category'].isin(selected_categories)) &
+    (df_sample['Import_Export'].isin(selected_import_export)) &
+    (df_sample['Payment_Terms'].isin(selected_payment_terms))
+]
+
 # Title of the dashboard
 st.title("Imports and Exports Dashboard")
 
-# Count the occurrences of each payment mode
-payment_mode_counts = df_sample['Payment_Terms'].value_counts()
+# Count the occurrences of each payment mode in the filtered data
+payment_mode_counts = filtered_df['Payment_Terms'].value_counts()
 
-# Plot a horizontal bar chart for payment modes
-st.subheader('Most Preferred Payment Modes')
-fig1, ax1 = plt.subplots(figsize=(8, 4))  # Adjusted size
-colors = plt.cm.viridis(np.linspace(0, 1, len(payment_mode_counts)))
-payment_mode_counts.plot(kind='barh', color=colors, ax=ax1)
+# Count the number of Import and Export transactions in the filtered data
+transaction_counts = filtered_df['Import_Export'].value_counts()
 
-# Add labels and title for payment modes
-ax1.set_title('Most Preferred Payment Modes')
-ax1.set_xlabel('Number of Transactions')
-ax1.set_ylabel('Payment Mode')
+# Create columns for the pie chart and horizontal bar chart
+col1, col2 = st.columns(2)
 
-# Show the plot for payment modes
-st.pyplot(fig1)
+with col1:
+    # Plot the pie chart for imports and exports
+    st.subheader('Percentage of Import and Export Transactions')
+    fig2, ax2 = plt.subplots(figsize=(4, 4))  # Adjusted size for better fit
+    ax2.pie(transaction_counts, labels=transaction_counts.index, autopct='%1.1f%%', startangle=90, colors=['skyblue', 'lightgreen'])
+    ax2.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+    st.pyplot(fig2)
 
-# Count the number of Import and Export transactions
-transaction_counts = df_sample['Import_Export'].value_counts()
+with col2:
+    # Plot a horizontal bar chart for payment modes
+    st.subheader('Most Preferred Payment Modes')
+    fig1, ax1 = plt.subplots(figsize=(4, 4))  # Adjusted size for better fit
+    colors = plt.cm.viridis(np.linspace(0, 1, len(payment_mode_counts)))
+    payment_mode_counts.plot(kind='barh', color=colors, ax=ax1)
 
-# Plot the pie chart for imports and exports
-st.subheader('Percentage of Import and Export Transactions')
-fig2, ax2 = plt.subplots(figsize=(8, 4))  # Adjusted size
-ax2.pie(transaction_counts, labels=transaction_counts.index, autopct='%1.1f%%', startangle=90, colors=['skyblue', 'lightgreen'])
-ax2.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-st.pyplot(fig2)
+    # Add labels and title for payment modes
+    ax1.set_title('Most Preferred Payment Modes')
+    ax1.set_xlabel('Number of Transactions')
+    ax1.set_ylabel('Payment Mode')
 
-# Group the data by Category and Import_Export, then count the number of transactions
-category_transaction_counts = df_sample.groupby(['Category', 'Import_Export']).size().unstack()
+    # Show the plot for payment modes
+    st.pyplot(fig1)
 
-# Plot a stacked bar chart
-st.subheader('Transactions by Category (Stacked by Import/Export)')
-fig3, ax3 = plt.subplots(figsize=(8, 4))  # Adjusted size
-category_transaction_counts.plot(kind='bar', stacked=True, ax=ax3, color=['skyblue', 'lightgreen'])
+# Group the filtered data by Category and Import_Export, then count the number of transactions
+category_transaction_counts = filtered_df.groupby(['Category', 'Import_Export']).size().unstack()
 
-# Add labels and title for stacked bar chart
-ax3.set_title('Transactions by Category (Stacked by Import/Export)')
-ax3.set_xlabel('Category')
-ax3.set_ylabel('Number of Transactions')
-ax3.legend(title='Transaction Type')
+# Create columns for the line chart and stacked bar chart
+col3, col4 = st.columns(2)
 
-# Show the plot for stacked bar chart
-st.pyplot(fig3)
+with col3:
+    # Plot the line graph for average transaction value by month
+    st.subheader('Average Value of Transactions by Month')
+    filtered_df['Date'] = pd.to_datetime(filtered_df['Date'], format='%d-%m-%Y')
+    filtered_df['Month'] = filtered_df['Date'].dt.month
+    monthly_avg_value = filtered_df.groupby(['Month', 'Import_Export'])['Value'].mean().unstack()
+    fig4, ax4 = plt.subplots(figsize=(4, 4))  # Adjusted size
 
-# Convert 'Date' column to datetime format
-df_sample['Date'] = pd.to_datetime(df_sample['Date'], format='%d-%m-%Y')
+    # Plot each import and export line
+    for column in monthly_avg_value.columns:
+        ax4.plot(monthly_avg_value.index, monthly_avg_value[column], marker='o', label=column)
 
-# Extract month from the date
-df_sample['Month'] = df_sample['Date'].dt.month
+    # Add labels and title for line graph
+    ax4.set_title('Average Value of Transactions by Month')
+    ax4.set_xlabel('Month')
+    ax4.set_ylabel('Average Transaction Value')
+    ax4.grid(True)
+    ax4.legend(title='Transaction Type')  # Add legend to distinguish between imports and exports
 
-# Group by month and Import_Export, then calculate the average transaction value
-monthly_avg_value = df_sample.groupby(['Month', 'Import_Export'])['Value'].mean().unstack()
+    # Show the plot for average transaction value
+    st.pyplot(fig4)
 
-# Plot the line graph for average transaction value by month
-st.subheader('Average Value of Transactions by Month')
-fig4, ax4 = plt.subplots(figsize=(8, 4))  # Adjusted size
+with col4:
+    # Plot a stacked bar chart
+    st.subheader('Transactions by Category (Stacked by Import/Export)')
+    fig3, ax3 = plt.subplots(figsize=(4, 4))  # Adjusted size
+    category_transaction_counts.plot(kind='bar', stacked=True, ax=ax3, color=['skyblue', 'lightgreen'])
 
-# Plot each import and export line
-for column in monthly_avg_value.columns:
-    ax4.plot(monthly_avg_value.index, monthly_avg_value[column], marker='o', label=column)
+    # Add labels and title for stacked bar chart
+    ax3.set_title('Transactions by Category (Stacked by Import/Export)')
+    ax3.set_xlabel('Category')
+    ax3.set_ylabel('Number of Transactions')
+    ax3.legend(title='Transaction Type')
 
-# Add labels and title for line graph
-ax4.set_title('Average Value of Transactions by Month')
-ax4.set_xlabel('Month')
-ax4.set_ylabel('Average Transaction Value')
-ax4.grid(True)
-ax4.legend(title='Transaction Type')  # Add legend to distinguish between imports and exports
+    # Show the plot for stacked bar chart
+    st.pyplot(fig3)
 
-# Show the plot for average transaction value
-st.pyplot(fig4)
-
-# Group the data by country and import/export status
-country_values = df_sample.groupby(['Country', 'Import_Export'])['Value'].sum().reset_index()
+# Group the data by country and import/export status from filtered data
+country_values = filtered_df.groupby(['Country', 'Import_Export'])['Value'].sum().reset_index()
 
 # Pivot the data for plotting
 country_values_pivot = country_values.pivot(index='Country', columns='Import_Export', values='Value').fillna(0)
