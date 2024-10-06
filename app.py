@@ -6,7 +6,7 @@ import numpy as np
 import plotly.express as px
 
 # Import dataset
-df = pd.read_csv('data/Imports_Exports_Dataset.csv')
+df = pd.read_csv(r'Imports_Exports_Dataset.csv')
 
 # Random Sample from the dataset
 df_sample = df.sample(n=3001, random_state=55011)
