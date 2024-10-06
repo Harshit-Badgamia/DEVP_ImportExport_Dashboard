@@ -26,11 +26,16 @@ selected_import_export = st.sidebar.multiselect("Select Import/Export", options=
 payment_terms = df_sample['Payment_Terms'].unique()
 selected_payment_terms = st.sidebar.multiselect("Select Payment Terms", options=payment_terms, default=payment_terms)
 
+# Ship Mode filter
+ship_modes = df_sample['Ship_Mode'].unique()  # Assuming the column name is 'Ship_Mode'
+selected_ship_modes = st.sidebar.multiselect("Select Ship Modes", options=ship_modes, default=ship_modes)
+
 # Filter the dataframe based on selections
 filtered_df = df_sample[
     (df_sample['Category'].isin(selected_categories)) &
     (df_sample['Import_Export'].isin(selected_import_export)) &
-    (df_sample['Payment_Terms'].isin(selected_payment_terms))
+    (df_sample['Payment_Terms'].isin(selected_payment_terms))&
+    (df_sample['Ship_Mode'].isin(selected_ship_modes))
 ]
 
 # Title of the dashboard
