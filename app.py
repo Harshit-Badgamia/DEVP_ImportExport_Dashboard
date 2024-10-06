@@ -75,13 +75,13 @@ if not filtered_df.empty:
 
     with col3:
         # Plot a stacked bar chart
-        st.markdown('### Transactions by Category (Stacked by Import/Export)')  # Changed to markdown for title
+        st.markdown('### Transactions by Category')  # Changed to markdown for title
         category_transaction_counts = filtered_df.groupby(['Category', 'Import_Export']).size().unstack()
         fig3, ax3 = plt.subplots(figsize=(5, 4))  # Adjusted size
         category_transaction_counts.plot(kind='bar', stacked=True, ax=ax3, color=['skyblue', 'lightgreen'])
 
         # Add labels and title for stacked bar chart
-        ax3.set_title('Transactions by Category (Stacked by Import/Export)', fontsize=10)
+        ax3.set_title('Transactions by Category', fontsize=10)
         ax3.set_xlabel('Category', fontsize=10)
         ax3.set_ylabel('Number of Transactions', fontsize=10)
         ax3.legend(title='Transaction Type')
@@ -128,7 +128,6 @@ if not filtered_df.empty:
                           locationmode='country names',  # Use country names
                           color='Total',  # Color based on total value
                           hover_name=country_values_pivot.index,
-                          title='Total Import and Export Values by Country',
                           color_continuous_scale=px.colors.sequential.Plasma,
                           labels={'Total': 'Total Value (in USD)'})
 
