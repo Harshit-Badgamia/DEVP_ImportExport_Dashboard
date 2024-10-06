@@ -48,7 +48,7 @@ col1, col2 = st.columns(2)
 with col1:
     # Plot the pie chart for imports and exports
     st.subheader('Percentage of Import and Export Transactions')
-    fig2, ax2 = plt.subplots(figsize=(4, 4))  # Adjusted size for better fit
+    fig2, ax2 = plt.subplots(figsize=(6, 6))  # Adjusted size for better fit
     ax2.pie(transaction_counts, labels=transaction_counts.index, autopct='%1.1f%%', startangle=90, colors=['skyblue', 'lightgreen'])
     ax2.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
     st.pyplot(fig2)
@@ -56,7 +56,7 @@ with col1:
 with col2:
     # Plot a horizontal bar chart for payment modes
     st.subheader('Most Preferred Payment Modes')
-    fig1, ax1 = plt.subplots(figsize=(4, 4))  # Adjusted size for better fit
+    fig1, ax1 = plt.subplots(figsize=(6, 6))  # Adjusted size for better fit
     colors = plt.cm.viridis(np.linspace(0, 1, len(payment_mode_counts)))
     payment_mode_counts.plot(kind='barh', color=colors, ax=ax1)
 
@@ -80,7 +80,7 @@ with col3:
     filtered_df['Date'] = pd.to_datetime(filtered_df['Date'], format='%d-%m-%Y')
     filtered_df['Month'] = filtered_df['Date'].dt.month
     monthly_avg_value = filtered_df.groupby(['Month', 'Import_Export'])['Value'].mean().unstack()
-    fig4, ax4 = plt.subplots(figsize=(4, 4))  # Adjusted size
+    fig4, ax4 = plt.subplots(figsize=(6, 6))  # Adjusted size
 
     # Plot each import and export line
     for column in monthly_avg_value.columns:
@@ -99,7 +99,7 @@ with col3:
 with col4:
     # Plot a stacked bar chart
     st.subheader('Transactions by Category (Stacked by Import/Export)')
-    fig3, ax3 = plt.subplots(figsize=(4, 4))  # Adjusted size
+    fig3, ax3 = plt.subplots(figsize=(6, 6))  # Adjusted size
     category_transaction_counts.plot(kind='bar', stacked=True, ax=ax3, color=['skyblue', 'lightgreen'])
 
     # Add labels and title for stacked bar chart
@@ -132,7 +132,7 @@ fig5 = px.choropleth(country_values_pivot,
                       labels={'Total': 'Total Value (in USD)'})
 
 # Update layout for larger size
-fig5.update_layout(width=1200, height=600)  # Adjust width and height as desired
+fig5.update_layout(width=1400, height=800)  # Adjust width and height as desired
 
 # Show the figure for choropleth map
 st.plotly_chart(fig5, use_container_width=True)
