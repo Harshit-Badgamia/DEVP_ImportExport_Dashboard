@@ -47,7 +47,7 @@ if not filtered_df.empty:
 
         # Plot the pie chart for imports and exports
         st.markdown('### Percentage of Import and Export Transactions')  # Changed to markdown for title
-        fig2, ax2 = plt.subplots(figsize=(3, 2))  # Adjusted size for better fit
+        fig2, ax2 = plt.subplots(figsize=(5, 4))  # Adjusted size for better fit
         ax2.pie(transaction_counts, labels=transaction_counts.index, autopct='%1.1f%%', startangle=90, colors=['skyblue', 'lightgreen'])
         ax2.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
         st.pyplot(fig2)
@@ -58,7 +58,7 @@ if not filtered_df.empty:
 
         # Plot a horizontal bar chart for payment modes
         st.markdown('### Most Preferred Payment Modes')  # Changed to markdown for title
-        fig1, ax1 = plt.subplots(figsize=(3, 2))  # Adjusted size for better fit
+        fig1, ax1 = plt.subplots(figsize=(5, 4))  # Adjusted size for better fit
         colors = plt.cm.viridis(np.linspace(0, 1, len(payment_mode_counts)))
         payment_mode_counts.plot(kind='barh', color=colors, ax=ax1)
 
@@ -77,7 +77,7 @@ if not filtered_df.empty:
         # Plot a stacked bar chart
         st.markdown('### Transactions by Category')  # Changed to markdown for title
         category_transaction_counts = filtered_df.groupby(['Category', 'Import_Export']).size().unstack()
-        fig3, ax3 = plt.subplots(figsize=(3, 2))  # Adjusted size
+        fig3, ax3 = plt.subplots(figsize=(5, 4))  # Adjusted size
         category_transaction_counts.plot(kind='bar', stacked=True, ax=ax3, color=['skyblue', 'lightgreen'])
 
         # Add labels and title for stacked bar chart
@@ -95,7 +95,7 @@ if not filtered_df.empty:
         filtered_df['Date'] = pd.to_datetime(filtered_df['Date'], format='%d-%m-%Y')
         filtered_df['Month'] = filtered_df['Date'].dt.month
         monthly_avg_value = filtered_df.groupby(['Month', 'Import_Export'])['Value'].mean().unstack()
-        fig4, ax4 = plt.subplots(figsize=(3, 2))  # Adjusted size
+        fig4, ax4 = plt.subplots(figsize=(5, 4))  # Adjusted size
 
         # Plot each import and export line
         for column in monthly_avg_value.columns:
